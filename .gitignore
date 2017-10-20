@@ -1,0 +1,12 @@
+src/*.js
+src/*.map
+src/**/*.js
+src/**/*.map
+test/*.js
+test/*.map
+npm-debug.log
+mochawesome-reports/
+node_modules/
+.idea/
+.yarnclean
+coverage/
