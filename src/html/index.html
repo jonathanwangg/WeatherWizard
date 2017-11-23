@@ -8,30 +8,54 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">        <!-- Makes me host Bootstrap -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>        <!-- Not sure if I'll need this -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://use.fontawesome.com/4c5e04f914.js"></script>
+
     </head>
     <body>
-
+<!-- checking if atom's github works -->
         <div class="jumbotron text-center">
             <h1>Weather Wizard</h1>
             <p>Finding your local weather!</p>
+            <p>Your current location is: </p>       <!-- TODO: Display current user location here -->
         </div>
+
+        <nav class="navbar">
+            <div class="d-flex justify-content-end">    <!-- TODO: don't know if it should be justify-content-end or justify-content-start // both give the same result -->
+                <div class="container-fluid">
+                    <div class="navbear-header">
+                        <a class="navbar-brand" href="">WeatherWizard</a>
+                    </div>
+                </div>
+            </div>
+
+            <form class="form-inline">
+                <div class="form-group">
+                    <input class="form-control" type="text"  placeholder="Location">
+                    <div class="input-group-btn">
+                        <button class="btn btn-outline-success my-2 my-sm 0" type="submit">
+                            <i class="fa fa-search" aria-hidden="true"> Search</i>      <!-- TODO: change to boostrap's font-->
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </nav>
 
         <div class="container">
             <div class="row">
                 <div class="col">
-                    <h1>Monday</h1>
+                    <h2>Monday</h2>
                 </div>
                 <div class="col">
-                    <h1>Tuesday</h1>
+                    <h2>Tuesday</h2>
                 </div>
                 <div class="col">
-                    <h1>Wednesday</h1>
+                    <h2>Wednesday</h2>
                 </div>
                 <div class="col">
-                    <h1>Thursday</h1>
+                    <h2>Thursday</h2>
                 </div>
                 <div class="col">
-                    <h1>Friday</h1>
+                    <h2>Friday</h2>
                 </div>
             </div>
         </div>
