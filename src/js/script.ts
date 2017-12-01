@@ -4,27 +4,51 @@ $(function () {
     var location = $('p.location');
 
 
+    function findWeather(): void {
+        getLocation();
+    }
+
     /**
+     * called when the user clicks the "find weather" button
      * get the user's current location, shows an error if the browser does not support Geolocation
      */
     function getLocation(): void {
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(locationSuccess, locationError)
+            navigator.geolocation.getCurrentPosition(locationSuccess, locationError);
         } else {
             showError("Your browser does not support Geolocation!");
         }
     }
 
+    /**
+     * callback function for when getting the geolocation (ie. lat and lon) succeed
+     * @param position
+     * @returns {Promise<void>}
+     */
     function locationSuccess(position) {
         try {
-            // instead of caching the results and maybe using old data,
-            // I want to call the api everytime someone wants to see the weather
-            var cache:boolean = sessionStorage.weatherCache && JSON.parse(sessionStorage.weatherCache);
-            var date:Date = new Date();
+            return new Promise(function (resolve, reject) {
+                // instead of caching the results and maybe using old data,
+                // I want to call the api everytime someone wants to see the weather
 
+                var xhr = new XMLHttpRequest();
+                var weatherResponse:string = xhr.open("GET", "api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon);
+                resolve(weatherResponse);
+            }).then(function (weatherResponse) {
+                var date:Date = new Date();
+                var city:string = weatherResponse.city.name;
+                var country:string = weatherResponse.country;
+                var temperature:string = weatherResponse.list.main.temp;
+                var minTemperature:string = weatherResponse.list.main.temp_min;
+                var maxTemperature:string = weatherResponse.list.main.temp_max;
+                var weather = weatherResponse.list.weather.id;
+                var weatherIcon = weatherResponse.list.weather.icon;
+            })
+
+        } catch (err) {
+            showError("We can't find information about your city!");
         }
     };
-
 
     /**
      * error handling functions
