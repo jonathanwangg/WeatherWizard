@@ -26,6 +26,8 @@ $(function () {
      * @returns {Promise<void>}
      */
     function locationSuccess(position) {
+        var lat = position.coords.latitude;
+        var lon = position.coords.longitude;
         try {
             return new Promise(function (resolve, reject) {
                 // instead of caching the results and maybe using old data,
