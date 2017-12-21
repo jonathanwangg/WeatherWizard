@@ -3,7 +3,9 @@ $(document).ready(function () {
     var weatherDiv = $('#weather');
     var location = $('p.location');
 
-    $("#findWeatherButton").onclick(function () {
+    getLocation();
+
+    $("#findWeatherButton").click(function () {
         getLocation();
     });
 
@@ -11,7 +13,8 @@ $(document).ready(function () {
      * called when the user clicks the "find weather" button
      * get the user's current location, shows an error if the browser does not support Geolocation
      */
-    function getLocation(): void {
+    function getLocation() {
+        document.getElementById("filler").innerHTML = "is this showing up?";
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(locationSuccess, locationError);
         } else {
@@ -38,7 +41,8 @@ $(document).ready(function () {
             }).then(function (weatherResponse):WeatherData {
                 var weatherData = new WeatherData();
                 var assignedWeatherData: WeatherData = setWeatherDataHelper(weatherData, weatherResponse);
-                displayWeatherData(assignedWeatherData);
+                displayCurrentCity(assignedWeatherData);
+                //displayWeatherData(assignedWeatherData);
             });
         } catch (err) {
             showError("We can't find information about your city!");
@@ -100,14 +104,19 @@ $(document).ready(function () {
         var months: string = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         var days: string = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-        var combinedDate: string = days[date.getDay() + ' ' + months[date.getMonth()] + ' ' + date.getDate() + ' ' + hours + minutes + ampm]
-
+        var combinedDate: string = days[date.getDay() + ' ' + months[date.getMonth()] + ' ' + date.getDate() + ' ' + hours + minutes + ampm];
         return combinedDate;
 
     };
 
-    function displayWeatherData(): void {
+    function displayWeatherData(assignedWeatherData: WeatherData): void {
+        // don't actually have to display all the fields of WeatherData ds, just want some of them
 
+    };
+
+    function displayCurrentCity(assignedWeatherData: WeatherData): void {
+        var element = document.getElementById("currentCity");
+        element.innerHTML = assignedWeatherData.city + ", " + assignedWeatherData.country ;
     }
 });
 
