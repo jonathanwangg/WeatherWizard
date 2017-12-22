@@ -5,3 +5,5 @@ Technologies Used:
 - TypeScript
 - HTML
 - CSS
+- jQuery
+- Bootstrap
