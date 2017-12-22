@@ -1,8 +1,7 @@
 # WeatherWizard
+Determine the 5-day weather forecast for a city by simply searching for it!
 
-# Technologies Used:
-# - TypeScript
-# - HTML
-# - CSS
-# The jquery-3.2.1.js file in my folder means I will be hosting jquery myself.
-# The script src = ...jquery means I can include it from a CDN such as Google or Microsoft.
+Technologies Used:
+- TypeScript
+- HTML
+- CSS
