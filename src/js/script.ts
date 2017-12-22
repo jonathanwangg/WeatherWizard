@@ -30,7 +30,7 @@ $(document).ready(function () {
      * @param position
      * @returns {Promise<void>}
      */
-    function locationSuccess(position: any): WeatherData {
+    function locationSuccess(position: any) {
         var lat = position.coords.latitude;
         var lon = position.coords.longitude;
         try {
