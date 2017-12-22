@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -19,12 +19,10 @@
     "url": "https://github.com/jonathanwangg/WeatherWizard/issues"
   },
   "homepage": "https://github.com/jonathanwangg/WeatherWizard#readme",
-  "scripts": {
-    "build": "tsc"
-  },
   "dependencies": {
-    "@types/node": "^6.0.52",
-    "typescript": "^2.1.X",
-    "ts-node": "^2.0.0"
+    "@types/jquery": "^3.2.17",
+    "@types/node": "^6.0.95",
+    "ts-node": "^2.0.0",
+    "typescript": "^2.1.X"
   }
 }

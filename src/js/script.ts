@@ -1,3 +1,6 @@
+import {WeatherData} from "./WeatherData"
+import $ = require("jquery");
+
 $(document).ready(function () {
     var deg = 'c';
     var weatherDiv = $('#weather');
@@ -5,9 +8,9 @@ $(document).ready(function () {
 
     getLocation();
 
-    $("#findWeatherButton").click(function () {
-        getLocation();
-    });
+    // $("#findWeatherButton").click(function () {
+    //     getLocation();
+    // });
 
     /**
      * called when the user clicks the "find weather" button
@@ -27,18 +30,19 @@ $(document).ready(function () {
      * @param position
      * @returns {Promise<void>}
      */
-    function locationSuccess(position): WeatherData {
+    function locationSuccess(position: any): WeatherData {
         var lat = position.coords.latitude;
         var lon = position.coords.longitude;
         try {
-            return new Promise(function (resolve, reject) {
+            return new Promise(function (resolve: any, reject: any) {
                 // instead of caching the results and maybe using old data,
                 // I want to call the api every time someone wants to see the weather
 
-                var xhr = new XMLHttpRequest();
-                var weatherResponse: string = xhr.open("GET", "api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon);
-                resolve(weatherResponse);
-            }).then(function (weatherResponse):WeatherData {
+                $.getJSON("api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon, function (weatherResponse) {
+                    resolve(weatherResponse);
+                });
+
+            }).then(function (weatherResponse: any) {
                 var weatherData = new WeatherData();
                 var assignedWeatherData: WeatherData = setWeatherDataHelper(weatherData, weatherResponse);
                 displayCurrentCity(assignedWeatherData);
@@ -55,8 +59,9 @@ $(document).ready(function () {
      * @param {string} weatherResponse the JSON string that we are returned from the GET request
      * @returns {WeatherData} the data structure with it's variables assigned
      */
-    function setWeatherDataHelper(weatherData: WeatherData, weatherResponse: string): WeatherData {
+    function setWeatherDataHelper(weatherData: WeatherData, weatherResponse: any): WeatherData {
         var date = new Date();
+        console.log("created a new Date object");
         weatherData.date = formatTimeIntoAMPM(date);
         weatherData.city = weatherResponse.city.name;
         weatherData.country = weatherResponse.country;
@@ -72,7 +77,7 @@ $(document).ready(function () {
      * error handling functions
      * @param error
      */
-    function locationError(error): void {
+    function locationError(error: any): void {
         switch (error.code) {
             case error.TIMEOUT:
                 showError("A timeout occurred! Please try again!");
@@ -89,7 +94,7 @@ $(document).ready(function () {
         }
     };
 
-    function showError(msg) {
+    function showError(msg: any) {
         weatherDiv.addClass('error').html(msg);
     };
 
@@ -98,13 +103,13 @@ $(document).ready(function () {
      * @returns {string} the current day and time in DAY_OF_THE_WEEK MONTH DAY HOUR MINS AMPM
      */
     function formatTimeIntoAMPM(date: Date): string {
-        var minutes: number = date.getMinutes.toString().length === 1 ? '0' + date.getMinutes() : date.getMinutes();
-        var hours: number = date.getHours().toString().length == 1 ? '0' + date.getHours() : date.getHours();
+        console.log("got into format time method");
+        var minutes: string|number = date.getMinutes.toString().length === 1 ? '0' + date.getMinutes() : date.getMinutes();
+        var hours: string|number = date.getHours().toString().length == 1 ? '0' + date.getHours() : date.getHours();
         var ampm: string = date.getHours() >= 12 ? 'pm' : 'am';
-        var months: string = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        var days: string = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        var months: string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-        var combinedDate: string = days[date.getDay() + ' ' + months[date.getMonth()] + ' ' + date.getDate() + ' ' + hours + minutes + ampm];
+        var combinedDate: string = date.getDay() + ' ' + months[date.getMonth()] + ' ' + date.getDate() + ' ' + hours + minutes + ampm;
         return combinedDate;
 
     };
@@ -115,21 +120,10 @@ $(document).ready(function () {
     };
 
     function displayCurrentCity(assignedWeatherData: WeatherData): void {
+        console.log("got into displayCurrentCity method")
         var element = document.getElementById("currentCity");
         element.innerHTML = assignedWeatherData.city + ", " + assignedWeatherData.country ;
     }
 });
-
-public class WeatherData {
-    date: string;
-    city: string;
-    country: string;
-    temperature: string;
-    minTemperature: string;
-    maxTemperature: string;
-    weather;
-    weatherIcon;
-}
-
 // An id should be unique within a page,
 // so you should use the #id selector when you want to find a single, unique element.

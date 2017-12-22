@@ -1,18 +1,19 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "ES5",
+    "target": "es5",
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
     "sourceMap": true,
     "typeRoots": [
-      "./node_modules/@types"
+      "../node_modules/@types"
+    ],
+    "types" : [
+      "core-js"
     ]
   },
   "filesGlob": [
-    "/src/**/*.ts",
-    "/test/**/*.ts"
+    "/src/**/*.ts"
   ],
   "exclude": [
     "node_modules"
