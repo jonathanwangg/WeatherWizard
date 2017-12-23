@@ -38,7 +38,8 @@ $(document).ready(function () {
                 // instead of caching the results and maybe using old data,
                 // I want to call the api every time someone wants to see the weather
 
-                $.getJSON("api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon, function (weatherResponse) {
+                $.getJSON("https://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon +
+                    "&appid=178e8d4180edebe4e2c02fcad75b72fd", function (weatherResponse) {
                     resolve(weatherResponse);
                 });
 
