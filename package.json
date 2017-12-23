@@ -24,5 +24,10 @@
     "@types/node": "^6.0.95",
     "ts-node": "^2.0.0",
     "typescript": "^2.1.X"
+  },
+  "devDependencies": {
+    "browserify": "^14.5.0",
+    "tsify": "^3.0.4",
+    "vinyl-source-stream": "^2.0.0"
   }
 }
