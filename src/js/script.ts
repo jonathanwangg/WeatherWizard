@@ -83,7 +83,7 @@ $(document).ready(function () {
         console.log("created a new Date object");
         weatherData.date = formatTimeIntoAMPM(date);
         weatherData.city = weatherResponse.city.name;
-        weatherData.country = weatherResponse.country;
+        weatherData.country = weatherResponse.city.country;
         return weatherData;
     }
 
