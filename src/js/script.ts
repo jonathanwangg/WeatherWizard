@@ -40,12 +40,21 @@ $(document).ready(function () {
 
                 $.getJSON("https://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon +
                     "&appid=178e8d4180edebe4e2c02fcad75b72fd", function (weatherResponse) {
+                    console.log("weatherResponse is: ");
+                    console.log(weatherResponse);
                     resolve(weatherResponse);
                 });
 
             }).then(function (weatherResponse: any) {
                 var weatherData = new WeatherData();
-                var assignedWeatherData: WeatherData = setWeatherDataHelper(weatherData, weatherResponse);
+                var generalWeatherData = setGeneralInformation(weatherData, weatherResponse);
+                var assignedWeatherData: WeatherData = setSingleDateWeatherDataHelper(generalWeatherData, weatherResponse);
+                console.log(".then weatherResponse is: ");
+                console.log(weatherResponse);
+                console.log(".then assingedWeatherData is: ");
+                console.log(assignedWeatherData);
+
+
                 displayCurrentCity(assignedWeatherData);
                 //displayWeatherData(assignedWeatherData);
             });
@@ -60,17 +69,21 @@ $(document).ready(function () {
      * @param {string} weatherResponse the JSON string that we are returned from the GET request
      * @returns {WeatherData} the data structure with it's variables assigned
      */
-    function setWeatherDataHelper(weatherData: WeatherData, weatherResponse: any): WeatherData {
-        var date = new Date();
-        console.log("created a new Date object");
-        weatherData.date = formatTimeIntoAMPM(date);
-        weatherData.city = weatherResponse.city.name;
-        weatherData.country = weatherResponse.country;
+    function setSingleDateWeatherDataHelper(weatherData: WeatherData, weatherResponse: any): WeatherData {
         weatherData.temperature = weatherResponse.list.main.temp;
         weatherData.minTemperature = weatherResponse.list.main.temp_min;
         weatherData.maxTemperature = weatherResponse.list.main.temp_max;
         weatherData.weather = weatherResponse.list.weather.id;
         weatherData.weatherIcon = weatherResponse.list.weather.icon;
+        return weatherData;
+    }
+
+    function setGeneralInformation(weatherData: WeatherData, weatherResponse: any): WeatherData {
+        var date = new Date();  // Don't think I should be creating a date since each date is different, need to use UTC thing
+        console.log("created a new Date object");
+        weatherData.date = formatTimeIntoAMPM(date);
+        weatherData.city = weatherResponse.city.name;
+        weatherData.country = weatherResponse.country;
         return weatherData;
     }
 
@@ -124,7 +137,47 @@ $(document).ready(function () {
         console.log("got into displayCurrentCity method")
         var element = document.getElementById("currentCity");
         element.innerHTML = assignedWeatherData.city + ", " + assignedWeatherData.country ;
+    };
+
+    /**
+     * Determines the minimum temperature for a specific day
+     * @param {number[]} minTempArray
+     */
+    function determineMinTemp(minTempArray: number[]) {
+        var min = minTempArray[0];
+        for (var i = 1; i < minTempArray.length - 1; i++) {
+            if (minTempArray[i] < min) {
+                min = minTempArray[i];
+            }
+        };
+        return min;
     }
+
+    /**
+     * Determines the maximum temperature for a specific day
+     * @param {number[]} minTempArray
+     */
+    function determineMaxTemp(maxTempArray: number[]) {
+        var max = maxTempArray[0];
+        for (var i = 1; i < maxTempArray.length - 1; i++) {
+            if (maxTempArray[i] > max) {
+                max = maxTempArray[i];
+            }
+        };
+        return max;
+    };
+
+    /**
+     * Create a week with 5 consecutive and unique days given an array of date/time calculations
+     * of UTC in strings
+     * @param {string[]} arrayOfDates
+     */
+    function createWeek(arrayOfDates: string[]): string[] {
+        // TODO: implement
+        return null;
+    }
+
+
 });
 // An id should be unique within a page,
 // so you should use the #id selector when you want to find a single, unique element.
