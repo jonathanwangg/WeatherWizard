@@ -12,6 +12,7 @@ $(document).ready(function () {
 
     getLocation();
 
+    // TODO: implement button functionality when everything ELSE is implemented
     // $("#findWeatherButton").click(function () {
     //     getLocation();
     // });
@@ -21,7 +22,6 @@ $(document).ready(function () {
      * get the user's current location, shows an error if the browser does not support Geolocation
      */
     function getLocation() {
-        document.getElementById("filler").innerHTML = "is this showing up?";
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(locationSuccess, locationError);
         } else {
@@ -92,7 +92,8 @@ $(document).ready(function () {
         var date = new Date();  // Don't think I should be creating a date since each date is different, need to use UTC thing
         console.log("created a new Date object");
         var uniqueWeek: Set<string> = createWeek(weatherResponse);
-        var daysOfTheWeek: Set<string> = createDaysOfTheWeek(uniqueWeek);
+        var daysOfTheWeek: string[] = createDaysOfTheWeek(uniqueWeek);
+        setDayOfTheWeekIntoHTML(daysOfTheWeek);
         weatherData.date = formatTimeIntoAMPM(date);
         weatherData.city = weatherResponse.city.name;
         weatherData.country = weatherResponse.city.country;
@@ -193,32 +194,32 @@ $(document).ready(function () {
         return setOfDates;
     };
 
-    function createDaysOfTheWeek(weekDates: Set<string>): Set<string> {
-        var daysOfTheWeek: Set<string> = new Set<string>();
+    /**
+     * Creates the (numbers) days of the week that correspond to the correct date
+     * eg. Dec.25th 1995 is a 1 which correspoinds to a Monday
+     * @param {Set<string>} weekDates the set of 5 consecutive dates in UTC format with only Year-Month-Date
+     * @returns {string[]} the array of the (word) days of the week in abbreviated form (eg. Monday = Mon)
+     */
+    function createDaysOfTheWeek(weekDates: Set<string>): string[] {
+        var daysOfTheWeek: string[] = [];
         weekDates.forEach(function (date: string) {
             var d = new Date(date);
             var numberOfDayOfWeek = d.getDay();
             var wordDayOfTheWeek = daysShort[numberOfDayOfWeek];
-            daysOfTheWeek.add(wordDayOfTheWeek);
-        })
+            daysOfTheWeek.push(wordDayOfTheWeek);
+        });
         // console.log("daysOfTheWeek is:");
         // console.log(daysOfTheWeek);
         return daysOfTheWeek;
     }
 
-    function setDayOfTheWeek(wordDayOfTheWeek: Set<string>) {
-        wordDayOfTheWeek.forEach(function (day: string) {
-        })
-
-        for (var i = 0; i < wordDayOfTheWeek.size; i++) {
-            document.getElementById("day" + i).innerHTML = wordDayOfTheWeek[i];
-        }
-
-    }
-
-
-
-
+    /**
+     * Sets the HTML for each (word) day of the week to the correct day
+     * @param {string[]} wordDayOfTheWeek the days of the week in the correct order
+     */
+    function setDayOfTheWeekIntoHTML(wordDayOfTheWeek: string[]) {
+        for (var i = 0; i < wordDayOfTheWeek.length; i++) {
+            document.getElementById("wordDay" + i).innerHTML = wordDayOfTheWeek[i];
+        };
+    };
 });
-// An id should be unique within a page,
-// so you should use the #id selector when you want to find a single, unique element.
