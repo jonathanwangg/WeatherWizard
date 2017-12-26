@@ -1,6 +1,10 @@
 import {WeatherData} from "./WeatherData"
 import $ = require("jquery");
 
+const months: string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const daysShort: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+
 $(document).ready(function () {
     var deg = 'c';
     var weatherDiv = $('#weather');
@@ -78,9 +82,17 @@ $(document).ready(function () {
         return weatherData;
     }
 
+    /**
+     * Sets the general information that is the same for all days of the week such as city and country
+     * @param {WeatherData} weatherData
+     * @param weatherResponse
+     * @returns {WeatherData}
+     */
     function setGeneralInformation(weatherData: WeatherData, weatherResponse: any): WeatherData {
         var date = new Date();  // Don't think I should be creating a date since each date is different, need to use UTC thing
         console.log("created a new Date object");
+        var uniqueWeek: Set<string> = createWeek(weatherResponse);
+        var daysOfTheWeek: Set<string> = createDaysOfTheWeek(uniqueWeek);
         weatherData.date = formatTimeIntoAMPM(date);
         weatherData.city = weatherResponse.city.name;
         weatherData.country = weatherResponse.city.country;
@@ -121,7 +133,7 @@ $(document).ready(function () {
         var minutes: string|number = date.getMinutes.toString().length === 1 ? '0' + date.getMinutes() : date.getMinutes();
         var hours: string|number = date.getHours().toString().length == 1 ? '0' + date.getHours() : date.getHours();
         var ampm: string = date.getHours() >= 12 ? 'pm' : 'am';
-        var months: string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        // var months: string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
         var combinedDate: string = date.getDay() + ' ' + months[date.getMonth()] + ' ' + date.getDate() + ' ' + hours + minutes + ampm;
         return combinedDate;
@@ -168,14 +180,37 @@ $(document).ready(function () {
     };
 
     /**
-     * Create a week with 5 consecutive and unique days given an array of date/time calculations
+     * Create a week with 5 consecutive and unique days given an array of date/time calculations (has the date values)
      * of UTC in strings
-     * @param {string[]} arrayOfDates
+     * @param {Set<string>} setOfDates set of dates for the week
      */
-    function createWeek(arrayOfDates: string[]): string[] {
-        // TODO: implement
-        return null;
+    function createWeek(weatherResponse: any): Set<string> {
+        var setOfDates = new Set();
+        for (var i = 0; i < weatherResponse.list.length; i++) {
+            var slicedDate = weatherResponse.list[i].dt_txt.slice(0,10);
+            setOfDates.add(slicedDate);
+        };
+        return setOfDates;
+    };
+
+    function createDaysOfTheWeek(weekDates: Set<string>) {
+        var daysOfTheWeek: Set<string> = new Set<string>();
+        weekDates.forEach(function (date: string) {
+            var d = new Date(date);
+            var numberOfDayOfWeek = d.getDay();
+            var wordDayOfTheWeek = daysShort[numberOfDayOfWeek];
+            daysOfTheWeek.add(wordDayOfTheWeek);
+        })
+        // console.log("daysOfTheWeek is:");
+        // console.log(daysOfTheWeek);
+        return daysOfTheWeek;
     }
+
+    function dayOfWeekHelper(date: Date) {
+
+    }
+
+
 
 
 });
