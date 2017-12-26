@@ -193,7 +193,7 @@ $(document).ready(function () {
         return setOfDates;
     };
 
-    function createDaysOfTheWeek(weekDates: Set<string>) {
+    function createDaysOfTheWeek(weekDates: Set<string>): Set<string> {
         var daysOfTheWeek: Set<string> = new Set<string>();
         weekDates.forEach(function (date: string) {
             var d = new Date(date);
@@ -206,7 +206,13 @@ $(document).ready(function () {
         return daysOfTheWeek;
     }
 
-    function dayOfWeekHelper(date: Date) {
+    function setDayOfTheWeek(wordDayOfTheWeek: Set<string>) {
+        wordDayOfTheWeek.forEach(function (day: string) {
+        })
+
+        for (var i = 0; i < wordDayOfTheWeek.size; i++) {
+            document.getElementById("day" + i).innerHTML = wordDayOfTheWeek[i];
+        }
 
     }
 
