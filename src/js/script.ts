@@ -1,7 +1,7 @@
 import {WeatherData} from "./WeatherData"
 import $ = require("jquery");
 
-const months: string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const months: string[]    = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const daysShort: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 
@@ -93,7 +93,9 @@ $(document).ready(function () {
         console.log("created a new Date object");
         var uniqueWeek: Set<string> = createWeek(weatherResponse);
         var daysOfTheWeek: string[] = createDaysOfTheWeek(uniqueWeek);
+        var datesOfTheWeek: string[] = createDatesOfTheWeek(uniqueWeek);
         setDayOfTheWeekIntoHTML(daysOfTheWeek);
+        setDatesOfTheWeekIntoHTML(datesOfTheWeek);
         weatherData.date = formatTimeIntoAMPM(date);
         weatherData.city = weatherResponse.city.name;
         weatherData.country = weatherResponse.city.country;
@@ -134,18 +136,13 @@ $(document).ready(function () {
         var minutes: string|number = date.getMinutes.toString().length === 1 ? '0' + date.getMinutes() : date.getMinutes();
         var hours: string|number = date.getHours().toString().length == 1 ? '0' + date.getHours() : date.getHours();
         var ampm: string = date.getHours() >= 12 ? 'pm' : 'am';
-        // var months: string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
         var combinedDate: string = date.getDay() + ' ' + months[date.getMonth()] + ' ' + date.getDate() + ' ' + hours + minutes + ampm;
         return combinedDate;
 
     };
 
-    function displayWeatherData(assignedWeatherData: WeatherData): void {
-        // don't actually have to display all the fields of WeatherData ds, just want some of them
-
-    };
-
+    // TODO: will need to be changed (refer to GitHub issues)
     function displayCurrentCity(assignedWeatherData: WeatherData): void {
         console.log("got into displayCurrentCity method")
         var element = document.getElementById("currentCity");
@@ -191,6 +188,8 @@ $(document).ready(function () {
             var slicedDate = weatherResponse.list[i].dt_txt.slice(0,10);
             setOfDates.add(slicedDate);
         };
+        console.log("createWeek returns: ")
+        console.log(setOfDates);
         return setOfDates;
     };
 
@@ -204,14 +203,11 @@ $(document).ready(function () {
         var daysOfTheWeek: string[] = [];
         weekDates.forEach(function (date: string) {
             var d = new Date(date);
-            var numberOfDayOfWeek = d.getDay();
-            var wordDayOfTheWeek = daysShort[numberOfDayOfWeek];
+            var wordDayOfTheWeek = daysShort[d.getDay()];
             daysOfTheWeek.push(wordDayOfTheWeek);
         });
-        // console.log("daysOfTheWeek is:");
-        // console.log(daysOfTheWeek);
         return daysOfTheWeek;
-    }
+    };
 
     /**
      * Sets the HTML for each (word) day of the week to the correct day
@@ -220,6 +216,34 @@ $(document).ready(function () {
     function setDayOfTheWeekIntoHTML(wordDayOfTheWeek: string[]) {
         for (var i = 0; i < wordDayOfTheWeek.length; i++) {
             document.getElementById("wordDay" + i).innerHTML = wordDayOfTheWeek[i];
+        };
+    };
+
+    /**
+     * Creates the (string) month-days of the month that correspond to the correct upcoming next
+     * 5 days
+     * (eg of a month-day Jan. 1)
+     * @param {Set<string>} weekDates the set of 5 consectuve dates in UTC format with only Year-Month-Date
+     * @returns {string[]} the array of the (string) month-days of the week
+     */
+    function createDatesOfTheWeek(weekDates: Set<string>): string[] {
+        var datesOfTheWeek: string[] = [];
+        weekDates.forEach(function (date: string) {
+            var d = new Date(date);
+            var monthDay: string = months[d.getMonth()] + ". " + d.getDate();
+            datesOfTheWeek.push(monthDay);
+        });
+        return datesOfTheWeek;
+    };
+
+    /**
+     * Sets the HTML for each date of the week to the correct date
+     * (eg. Dec 30)
+     * @param {string[]} datesOfTheWeek
+     */
+    function setDatesOfTheWeekIntoHTML(datesOfTheWeek: string[]) {
+        for (var i = 0; i < datesOfTheWeek.length; i++) {
+            document.getElementById("monthDay" + i).innerHTML = datesOfTheWeek[i];
         };
     };
 });
