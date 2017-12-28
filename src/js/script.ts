@@ -50,16 +50,18 @@ $(document).ready(function () {
                 });
 
             }).then(function (weatherResponse: any) {
+                // Don't have to create a new WeatherData here, just call set general
                 var weatherData = new WeatherData();
                 var generalWeatherData = setGeneralInformation(weatherData, weatherResponse);
-                var assignedWeatherData: WeatherData = setSingleDateWeatherDataHelper(generalWeatherData, weatherResponse);
+                // Not sure if this is the correct choice to pass a third parameter like that just b/c i need the variable in another part
+                //var assignedWeatherData: WeatherData = setSingleDateWeatherDataHelper(generalWeatherData, weatherResponse, []);
                 console.log(".then weatherResponse is: ");
                 console.log(weatherResponse);
                 console.log(".then assingedWeatherData is: ");
-                console.log(assignedWeatherData);
+                //console.log(assignedWeatherData);
 
 
-                displayCurrentCity(assignedWeatherData);
+                //displayCurrentCity(assignedWeatherData);
                 //displayWeatherData(assignedWeatherData);
             });
         } catch (err) {
@@ -67,18 +69,28 @@ $(document).ready(function () {
         }
     };
 
+    // this will be have to be done 5x, either one for loop or this method called 5 times
     /**
      * Helper function to set the weather data to their variables
      * @param {WeatherData} weatherData the data structure that holds all the data related to weather
      * @param {string} weatherResponse the JSON string that we are returned from the GET request
      * @returns {WeatherData} the data structure with it's variables assigned
      */
-    function setSingleDateWeatherDataHelper(weatherData: WeatherData, weatherResponse: any): WeatherData {
-        weatherData.temperature = weatherResponse.list.main.temp;
-        weatherData.minTemperature = weatherResponse.list.main.temp_min;
-        weatherData.maxTemperature = weatherResponse.list.main.temp_max;
-        weatherData.weather = weatherResponse.list.weather.id;
-        weatherData.weatherIcon = weatherResponse.list.weather.icon;
+    function setSingleDateWeatherDataHelper(weatherData: WeatherData, weatherResponse: any, uniqueWeek: Set<string>): WeatherData {
+        var uniqueWeekArray: string[] = [];
+        uniqueWeek.forEach(value => uniqueWeekArray.push(value))
+        // weatherData.temperature = weatherResponse.list.main.temp;
+        //weatherData.minTemperature = weatherResponse.list.main.temp_min;
+        // weatherData.minTemperature = determineMinTemp(weatherResponse, daysOfTheWeek);
+        //TODO: can't call methods using only 1 weather data, won't need to pass it since we'll be using 5
+        determineMinTemp(weatherResponse, uniqueWeekArray);
+        // weatherData.maxTemperature = weatherResponse.list.main.temp_max;
+        // weatherData.weather = weatherResponse.list.weather.id;
+        // weatherData.weatherIcon = weatherResponse.list.weather.icon;
+
+
+        // for all the the weatherResponse's dt_texts that contain a Year-Month-Day (must check if year-month-day
+        // is a substring of each dt_text), we will get the list.i value and then find the min and max temps
         return weatherData;
     }
 
@@ -96,9 +108,17 @@ $(document).ready(function () {
         var datesOfTheWeek: string[] = createDatesOfTheWeek(uniqueWeek);
         setDayOfTheWeekIntoHTML(daysOfTheWeek);
         setDatesOfTheWeekIntoHTML(datesOfTheWeek);
-        weatherData.date = formatTimeIntoAMPM(date);
-        weatherData.city = weatherResponse.city.name;
-        weatherData.country = weatherResponse.city.country;
+
+
+
+        setSingleDateWeatherDataHelper(weatherData, weatherResponse, uniqueWeek);
+        // TODO: RIGHT HERE RN
+        // for (var i = 0; i < daysOfTheWeek.length; i++) {
+        //     setSingleDateWeatherDataHelper(weatherData, weatherResponse, daysOfTheWeek);
+        // }
+        // weatherData.date = formatTimeIntoAMPM(date);
+        // weatherData.city = weatherResponse.city.name;
+        // weatherData.country = weatherResponse.city.country;
         return weatherData;
     }
 
@@ -153,7 +173,7 @@ $(document).ready(function () {
      * Determines the minimum temperature for a specific day
      * @param {number[]} minTempArray
      */
-    function determineMinTemp(minTempArray: number[]) {
+    function determineMinTemp1(minTempArray: number[]) {
         var min = minTempArray[0];
         for (var i = 1; i < minTempArray.length - 1; i++) {
             if (minTempArray[i] < min) {
@@ -161,6 +181,34 @@ $(document).ready(function () {
             }
         };
         return min;
+    }
+
+    function determineMinTemp(weatherResponse: any, uniqueWeek: string[]): number[] {
+        // for all temps corresponding to a certain Year-mOnth-Date,
+        // determine the min temp of all
+        var arrayOfMinTempsWeek: number[] = [];
+        for (let j = 0; j < uniqueWeek.length; j++) {
+            let arrayOfMinTempsSingleDay: number[] = [];
+            for (let i = 0; i < weatherResponse.list.length; i++) {
+                if (weatherResponse.list[i].dt_txt.includes(uniqueWeek[j])) {
+                    arrayOfMinTempsSingleDay.push(weatherResponse.list[i].main.temp_min);
+                }
+            };
+
+            console.log("arrayofMinTempsSingleDay for day " + j);
+            console.log(arrayOfMinTempsSingleDay);
+
+            let trueMinTemp: number = arrayOfMinTempsSingleDay[0];
+            for (let i = 1; i < arrayOfMinTempsSingleDay.length; i++) {
+                if (arrayOfMinTempsSingleDay[i] < trueMinTemp) {
+                    trueMinTemp = arrayOfMinTempsSingleDay[i];
+                }
+            };
+            arrayOfMinTempsWeek.push(trueMinTemp);
+        }
+        console.log("arrayOfMinTempsWeek is:");
+        console.log(arrayOfMinTempsWeek);
+        return arrayOfMinTempsWeek;
     }
 
     /**
@@ -206,6 +254,8 @@ $(document).ready(function () {
             var wordDayOfTheWeek = daysShort[d.getDay()];
             daysOfTheWeek.push(wordDayOfTheWeek);
         });
+        console.log("daysOfTheWeek are:");
+        console.log(daysOfTheWeek);
         return daysOfTheWeek;
     };
 
@@ -214,9 +264,11 @@ $(document).ready(function () {
      * @param {string[]} wordDayOfTheWeek the days of the week in the correct order
      */
     function setDayOfTheWeekIntoHTML(wordDayOfTheWeek: string[]) {
-        for (var i = 0; i < wordDayOfTheWeek.length; i++) {
+        for (var i = 0; i < wordDayOfTheWeek.length - 1; i++) {
+            console.log("is this running in Day" + i);
             document.getElementById("wordDay" + i).innerHTML = wordDayOfTheWeek[i];
         };
+        console.log("done setting all days");
     };
 
     /**
@@ -233,6 +285,8 @@ $(document).ready(function () {
             var monthDay: string = months[d.getMonth()] + ". " + d.getDate();
             datesOfTheWeek.push(monthDay);
         });
+        console.log("datesOfTheWeek are:");
+        console.log(datesOfTheWeek);
         return datesOfTheWeek;
     };
 
@@ -242,7 +296,11 @@ $(document).ready(function () {
      * @param {string[]} datesOfTheWeek
      */
     function setDatesOfTheWeekIntoHTML(datesOfTheWeek: string[]) {
-        for (var i = 0; i < datesOfTheWeek.length; i++) {
+        console.log("in the setDates method");
+        console.log("datesOfTheWeek is:");
+        console.log(datesOfTheWeek);
+        for (var i = 0; i < datesOfTheWeek.length - 1; i++) {
+            console.log("is this running " + i);
             document.getElementById("monthDay" + i).innerHTML = datesOfTheWeek[i];
         };
     };
