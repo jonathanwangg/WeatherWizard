@@ -81,9 +81,10 @@ $(document).ready(function () {
         uniqueWeek.forEach(value => uniqueWeekArray.push(value))
         // weatherData.temperature = weatherResponse.list.main.temp;
         //weatherData.minTemperature = weatherResponse.list.main.temp_min;
-        // weatherData.minTemperature = determineMinTemp(weatherResponse, daysOfTheWeek);
         //TODO: can't call methods using only 1 weather data, won't need to pass it since we'll be using 5
-        determineMinTemp(weatherResponse, uniqueWeekArray);
+        var currentTempWeek = determineCurrentTemp(weatherResponse, uniqueWeekArray);
+        var minTempWeek = determineMinTemp(weatherResponse, uniqueWeekArray);
+        var maxTempWeek = determineMaxTemp(weatherResponse, uniqueWeekArray);
         // weatherData.maxTemperature = weatherResponse.list.main.temp_max;
         // weatherData.weather = weatherResponse.list.weather.id;
         // weatherData.weatherIcon = weatherResponse.list.weather.icon;
@@ -104,6 +105,8 @@ $(document).ready(function () {
         var date = new Date();  // Don't think I should be creating a date since each date is different, need to use UTC thing
         console.log("created a new Date object");
         var uniqueWeek: Set<string> = createWeek(weatherResponse);
+        console.log("unique week:")
+        console.log(uniqueWeek);
         var daysOfTheWeek: string[] = createDaysOfTheWeek(uniqueWeek);
         var datesOfTheWeek: string[] = createDatesOfTheWeek(uniqueWeek);
         setDayOfTheWeekIntoHTML(daysOfTheWeek);
@@ -169,20 +172,6 @@ $(document).ready(function () {
         element.innerHTML = assignedWeatherData.city + ", " + assignedWeatherData.country ;
     };
 
-    /**
-     * Determines the minimum temperature for a specific day
-     * @param {number[]} minTempArray
-     */
-    function determineMinTemp1(minTempArray: number[]) {
-        var min = minTempArray[0];
-        for (var i = 1; i < minTempArray.length - 1; i++) {
-            if (minTempArray[i] < min) {
-                min = minTempArray[i];
-            }
-        };
-        return min;
-    }
-
     function determineMinTemp(weatherResponse: any, uniqueWeek: string[]): number[] {
         // for all temps corresponding to a certain Year-mOnth-Date,
         // determine the min temp of all
@@ -211,19 +200,51 @@ $(document).ready(function () {
         return arrayOfMinTempsWeek;
     }
 
-    /**
-     * Determines the maximum temperature for a specific day
-     * @param {number[]} minTempArray
-     */
-    function determineMaxTemp(maxTempArray: number[]) {
-        var max = maxTempArray[0];
-        for (var i = 1; i < maxTempArray.length - 1; i++) {
-            if (maxTempArray[i] > max) {
-                max = maxTempArray[i];
-            }
-        };
-        return max;
-    };
+    function determineMaxTemp(weatherResponse: any, uniqueWeek: string[]): number[] {
+        // for all temps corresponding to a certain Year-mOnth-Date,
+        // determine the max temp of all
+        var arrayOfMaxTempsWeek: number[] = [];
+        for (let j = 0; j < uniqueWeek.length; j++) {
+            let arrayOfMaxTempsSingleDay: number[] = [];
+            for (let i = 0; i < weatherResponse.list.length; i++) {
+                if (weatherResponse.list[i].dt_txt.includes(uniqueWeek[j])) {
+                    arrayOfMaxTempsSingleDay.push(weatherResponse.list[i].main.temp_max);
+                }
+            };
+
+            console.log("arrayofMaxTempsSingleDay for day " + j);
+            console.log(arrayOfMaxTempsSingleDay);
+
+            let trueMaxTemp: number = arrayOfMaxTempsSingleDay[0];
+            for (let i = 1; i < arrayOfMaxTempsSingleDay.length; i++) {
+                if (arrayOfMaxTempsSingleDay[i] > trueMaxTemp) {
+                    trueMaxTemp = arrayOfMaxTempsSingleDay[i];
+                }
+            };
+            arrayOfMaxTempsWeek.push(trueMaxTemp);
+        }
+        console.log("arrayOfMaxTempsWeek is:");
+        console.log(arrayOfMaxTempsWeek);
+        return arrayOfMaxTempsWeek;
+    }
+
+    function determineCurrentTemp(weatherResponse: any, uniqueWeek: string[]): number[] {
+        // for all temps corresponding to a certain Year-mOnth-Date,
+        // determine the min temp of all
+        var arrayOfCurrentTempsWeek: number[] = [];
+        for (let j = 0; j < uniqueWeek.length; j++) {
+            let arrayOfCurrentTempsSingleDay: number[] = [];
+            for (let i = 0; i < weatherResponse.list.length; i++) {
+                if (weatherResponse.list[i].dt_txt.includes(uniqueWeek[j])) {
+                    arrayOfCurrentTempsWeek.push(weatherResponse.list[i].main.temp);
+                    break;
+                }
+            };
+        }
+        console.log("arrayOfCurrentTempsWeek is:");
+        console.log(arrayOfCurrentTempsWeek);
+        return arrayOfCurrentTempsWeek;
+    }
 
     /**
      * Create a week with 5 consecutive and unique days given an array of date/time calculations (has the date values)
@@ -264,7 +285,7 @@ $(document).ready(function () {
      * @param {string[]} wordDayOfTheWeek the days of the week in the correct order
      */
     function setDayOfTheWeekIntoHTML(wordDayOfTheWeek: string[]) {
-        for (var i = 0; i < wordDayOfTheWeek.length - 1; i++) {
+        for (var i = 0; i < 5; i++) {
             console.log("is this running in Day" + i);
             document.getElementById("wordDay" + i).innerHTML = wordDayOfTheWeek[i];
         };
@@ -299,7 +320,7 @@ $(document).ready(function () {
         console.log("in the setDates method");
         console.log("datesOfTheWeek is:");
         console.log(datesOfTheWeek);
-        for (var i = 0; i < datesOfTheWeek.length - 1; i++) {
+        for (var i = 0; i < 5; i++) {
             console.log("is this running " + i);
             document.getElementById("monthDay" + i).innerHTML = datesOfTheWeek[i];
         };
