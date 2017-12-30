@@ -4,25 +4,27 @@ import {parse} from "ts-node/dist";
 
 const months: string[]    = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const daysShort: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const appid:string = "178e8d4180edebe4e2c02fcad75b72fd";
+const appid: string = "178e8d4180edebe4e2c02fcad75b72fd";
 
 
 $(document).ready(function () {
     var deg = '&#176';
     var celsius = 'C';
+    var fahrenheit = 'F';
     var weatherDiv = $('#weather');
 
     getLocation();
 
+    /**
+     * Callback function for custom location searches
+     * @returns {Promise<void>}
+     */
     function customSearch() {
-        console.log("in callback function of #searchButton jquery");
         var searchParameter:string = (<HTMLInputElement>document.getElementById("searchBox")).value;
         try {
             return new Promise(function (resolve: any, reject: any) {
                 if (searchParameter !== "") {
                     $.getJSON("https://api.openweathermap.org/data/2.5/forecast?q=" + searchParameter + "&appid=" + appid, function (weatherResponse) {
-                        console.log("weatherResponse for searching is: ");
-                        console.log(weatherResponse);
                         resolve(weatherResponse);
                     });
                 } else {
@@ -38,19 +40,23 @@ $(document).ready(function () {
             showError("We can't find information about your city!");
         }
     }
-    // TODO: implement button functionality when everything ELSE is implemented
+
     $("#searchButton").click(customSearch);
 
-    $(document).keypress(function (e) {
-        if(e.keyCode === 13) {
-            e.preventDefault();
+    /**
+     * handler for when the enter key is pressed, do a custom search for location and disallow refresh
+     */
+    $(document).keypress(function (event) {
+        if(event.keyCode === 13) {
+            event.preventDefault();
             customSearch();
         }
     });
 
     /**
-     * called when the user clicks the "find weather" button
-     * get the user's current location, shows an error if the browser does not support Geolocation
+     * called when the user clicks the "Search" button
+     * get the user's current location and calls the appropriate callback function,
+     * shows an error if the browser does not support Geolocation
      */
     function getLocation() {
         if (navigator.geolocation) {
@@ -62,7 +68,7 @@ $(document).ready(function () {
 
     /**
      * callback function for when getting the geolocation (ie. lat and lon) succeed
-     * @param position
+     * @param position the fulfilled value from the promise
      * @returns {Promise<void>}
      */
     function locationSuccess(position: any) {
@@ -72,8 +78,6 @@ $(document).ready(function () {
             return new Promise(function (resolve: any, reject: any) {
                 $.getJSON("https://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon +
                     "&appid=" + appid, function (weatherResponse) {
-                    console.log("weatherResponse is: ");
-                    console.log(weatherResponse);
                     resolve(weatherResponse);
                 });
 
@@ -88,10 +92,11 @@ $(document).ready(function () {
     };
 
     /**
-     * Helper function to set the weather data to their variables
-     * @param {WeatherData} weatherData the data structure that holds all the data related to weather
-     * @param {string} weatherResponse the JSON string that we are returned from the GET request
-     * @returns {WeatherData} the data structure with it's variables assigned
+     *
+     * @param {WeatherData} weatherData
+     * @param weatherResponse the JSON response from API call
+     * @param {string[]} uniqueWeek the week of the forecast
+     * @returns {WeatherData}
      */
     function setSingleDateWeatherDataHelper(weatherData: WeatherData, weatherResponse: any, uniqueWeek: string[]): WeatherData {
         // TODO: Keep this here since I'm not sure if I can refactor this into using multiple WeatherData data strucures instead.
@@ -102,41 +107,41 @@ $(document).ready(function () {
         // weatherData.weatherIcon = weatherResponse.list.weather.icon;
 
         var currentTempWeek: number[] = determineCurrentTemp(weatherResponse, uniqueWeek);
-        setCurrentTempWeekIntoHTML(currentTempWeek);
-        var minTempWeek = determineMinTemp(weatherResponse, uniqueWeek);
-        setMinTempWeekIntoHTML(minTempWeek);
-        var maxTempWeek = determineMaxTemp(weatherResponse, uniqueWeek);
-        setMaxTempWeekIntoHTML(maxTempWeek);
-        var weatherDescriptions = determineWeatherDescriptions(weatherResponse, uniqueWeek);
-        setWeatherDescWeekIntoHTML(weatherDescriptions);
+        var minTempWeek: number[] = determineMinTemp(weatherResponse, uniqueWeek);
+        var maxTempWeek: number[] = determineMaxTemp(weatherResponse, uniqueWeek);
+        var weatherDescriptions: string[] = determineWeatherDescriptions(weatherResponse, uniqueWeek);
         var weatherIconIds: string[] = determineWeatherIconIDs(weatherResponse, uniqueWeek);
+        setCurrentTempWeekIntoHTML(currentTempWeek);
+        setMinTempWeekIntoHTML(minTempWeek);
+        setMaxTempWeekIntoHTML(maxTempWeek);
+        setWeatherDescWeekIntoHTML(weatherDescriptions);
         setWeatherIconWeekIntoHTML(weatherIconIds);
 
         return weatherData;
     }
 
     /**
-     * Sets the general information that is the same for all days of the week such as city and country
+     * Sets general information into HTML
      * @param {WeatherData} weatherData
-     * @param weatherResponse
+     * @param weatherResponse the JSON response from API call
      * @returns {WeatherData}
      */
     function setGeneralInformation(weatherData: WeatherData, weatherResponse: any): WeatherData {
         var uniqueWeek: string[] = createWeek(weatherResponse);
         var daysOfTheWeek: string[] = createDaysOfTheWeek(uniqueWeek);
         var datesOfTheWeek: string[] = createDatesOfTheWeek(uniqueWeek);
-        setDayOfTheWeekIntoHTML(daysOfTheWeek);
-        setDatesOfTheWeekIntoHTML(datesOfTheWeek);
         var city = determineCity(weatherResponse);
         var country = determineCountry(weatherResponse);
+        setDayOfTheWeekIntoHTML(daysOfTheWeek);
+        setDatesOfTheWeekIntoHTML(datesOfTheWeek);
         setCityAndCountryIntoHTML(city, country);
 
         setSingleDateWeatherDataHelper(weatherData, weatherResponse, uniqueWeek);
-        return weatherData;
+        return weatherData; // TODO: currently there is no point of even returning a WeatherData since it's never used
     }
 
     /**
-     * error handling functions
+     * error handling functions for location errors
      * @param error
      */
     function locationError(error: any): void {
@@ -156,20 +161,22 @@ $(document).ready(function () {
         }
     };
 
+    // TODO: Not sure how this is being used
+    /**
+     *
+     * @param msg
+     */
     function showError(msg: any) {
         weatherDiv.addClass('error').html(msg);
     };
 
-    // TODO: will need to be changed (refer to GitHub issues)
-    function displayCurrentCity(assignedWeatherData: WeatherData): void {
-        console.log("got into displayCurrentCity method")
-        var element = document.getElementById("currentCity");
-        element.innerHTML = assignedWeatherData.city + ", " + assignedWeatherData.country ;
-    };
-
+    /**
+     * Determines the minimum temperature of each day for a given week
+     * @param weatherResponse the JSON response from API call
+     * @param {string[]} uniqueWeek the week of the forecast
+     * @returns {number[]} the array of minimum temperatures (in Celsius) where 1st element is 1st day, 2nd element is 2nd day, ...
+     */
     function determineMinTemp(weatherResponse: any, uniqueWeek: string[]): number[] {
-        // for all temps corresponding to a certain Year-mOnth-Date,
-        // determine the min temp of all
         var arrayOfMinTempsWeek: number[] = [];
         for (let j = 0; j < uniqueWeek.length; j++) {
             let arrayOfMinTempsSingleDay: number[] = [];
@@ -193,9 +200,13 @@ $(document).ready(function () {
         return arrayOfMinTempsCelsiusIntegerWeek;
     };
 
+    /**
+     * Determines the maximum temperature of each day for a given week
+     * @param weatherResponse the JSON response from API call
+     * @param {string[]} uniqueWeek the week of the forecast
+     * @returns {number[]} the array of maximum temperatures (in Celsius) where 1st element is 1st day, 2nd element is 2nd day, ...
+     */
     function determineMaxTemp(weatherResponse: any, uniqueWeek: string[]): number[] {
-        // for all temps corresponding to a certain Year-mOnth-Date,
-        // determine the max temp of all
         var arrayOfMaxTempsWeek: number[] = [];
         for (let j = 0; j < uniqueWeek.length; j++) {
             let arrayOfMaxTempsSingleDay: number[] = [];
@@ -219,10 +230,13 @@ $(document).ready(function () {
         return arrayOfMaxTempsCelsiusIntegerWeek;
     };
 
-    // all temps are in kelvin before converting
+    /**
+     * Determines the first temperature for the same time of each day for a given week
+     * @param weatherResponse the JSON response from API call
+     * @param {string[]} uniqueWeek the week of the forecast
+     * @returns {number[]} the array of current temperatures (in Celsius) where 1st element is 1st day, 2nd element is 2nd day, ...
+     */
     function determineCurrentTemp(weatherResponse: any, uniqueWeek: string[]): number[] {
-        // for all temps corresponding to a certain Year-mOnth-Date,
-        // determine the min temp of all
         var arrayOfCurrentTempsWeek: number[] = [];
         for (let j = 0; j < uniqueWeek.length; j++) {
             let arrayOfCurrentTempsSingleDay: number[] = [];
@@ -236,11 +250,15 @@ $(document).ready(function () {
 
         var arrayOfCurrentTempsCelsiusWeek: number[] = arrayOfCurrentTempsWeek.map(kelvinToCelsius);
         var arrayOfCurrentTempsCelsiusIntegerWeek: number[] = arrayOfCurrentTempsCelsiusWeek.map(currentTempKelvin => Math.floor(currentTempKelvin));
-        //console.log("arrayOfCurrentTempsWeek is:");
-        //console.log(arrayOfCurrentTempsWeek);
         return arrayOfCurrentTempsCelsiusIntegerWeek;
     };
 
+    /**
+     * Determines the weather descriptions at a specific time of each day for a given week
+     * @param weatherResponse the JSON response from API call
+     * @param {string[]} uniqueWeek the week of the forecast
+     * @returns {string[]} the array of weather descriptions
+     */
     function determineWeatherDescriptions(weatherResponse: any, uniqueWeek: string[]): string[] {
         var timeOfDay =  " 09:00:00";
         var arrayOfWeatherDesc: string[] = [];
@@ -256,6 +274,12 @@ $(document).ready(function () {
         return arrayOfWeatherDesc;
     };
 
+    /**
+     * Determines the weather icon id's at a specific time of each day for a given week
+     * @param weatherResponse the JSON response from API call
+     * @param {string[]} uniqueWeek the week of the forecast
+     * @returns {string[]} the array of weather icon id's
+     */
     function determineWeatherIconIDs(weatherResponse: any, uniqueWeek: string[]): string[] {
         var arrayOfWeatherIconIds: string[] = [];
         var timeOfDay =  " 09:00:00";
@@ -271,10 +295,20 @@ $(document).ready(function () {
         return arrayOfWeatherIconIds;
     };
 
+    /**
+     * Determines the city of which the API call made it to
+     * @param weatherResponse the JSON response from API call
+     * @returns {string} the city corresponding to the weather response
+     */
     function determineCity(weatherResponse: any): string {
         return weatherResponse.city.name;
     };
 
+    /**
+     * Determines the country of which the API call made it to
+     * @param weatherResponse the JSON response from API call
+     * @returns {string} the country corresponding to the weather response
+     */
     function determineCountry(weatherResponse: any): string {
         return weatherResponse.city.country;
     };
@@ -282,7 +316,7 @@ $(document).ready(function () {
     /**
      * Create a week with 5 consecutive and unique days given an array of date/time calculations (has the date values)
      * of UTC in strings
-     * @param {Set<string>} setOfDates set of dates for the week
+     * @param {string[]} setOfDates set of dates for the week
      */
     function createWeek(weatherResponse: any): string[] {
         var arrayOfDates: string[] = [];
@@ -298,7 +332,7 @@ $(document).ready(function () {
     /**
      * Creates the (numbers) days of the week that correspond to the correct date
      * eg. Dec.25th 1995 is a 1 which correspoinds to a Monday
-     * @param {Set<string>} weekDates the set of 5 consecutive dates in UTC format with only Year-Month-Date
+     * @param {string[]} weekDates the array of 5 consecutive dates in UTC format with only Year-Month-Date
      * @returns {string[]} the array of the (word) days of the week in abbreviated form (eg. Monday = Mon)
      */
     function createDaysOfTheWeek(weekDates: string[]): string[] {
@@ -328,7 +362,7 @@ $(document).ready(function () {
      * Creates the (string) month-days of the month that correspond to the correct upcoming next
      * 5 days
      * (eg of a month-day Jan. 1)
-     * @param {Set<string>} weekDates the set of 5 consectuve dates in UTC format with only Year-Month-Date
+     * @param {string[]} weekDates the array of 5 consectuve dates in UTC format with only Year-Month-Date
      * @returns {string[]} the array of the (string) month-days of the week
      */
     function createDatesOfTheWeek(weekDates: string[]): string[] {
@@ -355,40 +389,70 @@ $(document).ready(function () {
         };
     };
 
+    /**
+     * Sets the HTML for the city and country corresponding to the weather response
+     * @param {string} city
+     * @param {string} country
+     */
     function setCityAndCountryIntoHTML(city: string, country: string) {
         document.getElementById("currentCityAndCountry").innerText = "Location: " + city + ", " + country;
     };
 
+    /**
+     * Sets the HTML for the current temperature for each day of the week
+     * @param {number[]} currentTempWeek
+     */
     function setCurrentTempWeekIntoHTML(currentTempWeek: number[]) {
         for (let i = 0; i < 5; i++) {
             document.getElementById("currentTemp" + i).innerHTML = currentTempWeek[i] + " " + deg + celsius;
         }
     };
 
+    /**
+     * Sets the HTML for the minimum temperature for each day of the week
+     * @param {number[]} minTempWeek
+     */
     function setMinTempWeekIntoHTML(minTempWeek: number[]) {
         for (let i = 0; i < 5; i++) {
             document.getElementById("minTemp" + i).innerHTML = "Low: " + minTempWeek[i] + " " + deg + celsius;
         }
     };
 
+    /**
+     * Sets the HTML for the maximum temperature for each day of the week
+     * @param {number[]} maxTempWeek
+     */
     function setMaxTempWeekIntoHTML(maxTempWeek: number[]) {
         for (let i = 0; i < 5; i++) {
             document.getElementById("maxTemp" + i).innerHTML = "High: " + maxTempWeek[i] + " " + deg + celsius;
         }
     };
 
+    /**
+     * Sets the HTML for the weather descriptions for each day of the week
+     * @param {string[]} weatherDescriptions
+     */
     function setWeatherDescWeekIntoHTML(weatherDescriptions: string[]) {
         for (let i = 0; i < 5; i++) {
             document.getElementById("forecast" + i).innerHTML = weatherDescriptions[i];
         }
     }
 
+    /**
+     * Sets the HTML for the weather icons for each day of the week
+     * @param {string[]} weatherIconIds
+     */
     function setWeatherIconWeekIntoHTML(weatherIconIds: string[]) {
         for (let i = 0; i < weatherIconIds.length; i++) {
             document.getElementById("icon" + i).setAttribute("src","http://openweathermap.org/img/w/" + weatherIconIds[i] + ".png");
         }
     }
 
+    /**
+     * Converts a temperature from Kelvin to Celsius
+     * @param {number} kelvin
+     * @returns {number} the same temperature in degrees Celsius
+     */
     function kelvinToCelsius(kelvin: number): number {
         return kelvin - 273.15;
     };
