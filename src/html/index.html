@@ -12,26 +12,24 @@
     <body>
         <div class="jumbotron text-center">
             <h1 href="">Weather Wizard</h1>
-            <p>Finding your local weather!</p>
-            <!-- Your current location is: -->
-            <p id="currentCityAndCountry">current city and country placeholder</p>
+            <p>Search for weather anywhere!</p>
+            <p id="currentCityAndCountry">weather for city and country placeholder</p>
         </div>
 
         <nav class="navbar">
             <div class="d-flex justify-content-end">    <!-- TODO: don't know if it should be justify-content-end or justify-content-start // both give the same result -->
                 <div class="container-fluid">
                     <div class="navbear-header">
-                        <a class="navbar-brand" href="">Refresh Results</a>
+                        <a class="navbar-brand" href="">Weather for Current Location</a>
                     </div>
                 </div>
             </div>
 
             <form class="form-inline">
                 <div class="form-group">
-                    <input class="form-control" type="text"  placeholder="city, country code">
+                    <input class="form-control" id="searchBox" type="text" placeholder="city, country code">
                     <div class="input-group-btn">
-                        <input class="btn btn-outline-success my-2 my-sm 0" id="searchButton" type="submit">
-                            <i class="fa fa-search" aria-hidden="true"> Search</i>      <!-- TODO: change to boostrap's font-->
+                        <input class="btn btn-outline-success my-2 my-sm 0" id="searchButton" type="button" value="Search" onsubmit="return false;">
                         </input>
                     </div>
                 </div>
@@ -44,7 +42,7 @@
                     <h4 id="wordDay0">Day 0</h4>
                     <h4 id="monthDay0">month-day 0</h4>
                     <h4 id="forecast0">Forecast</h4>
-                    <img src="" id="icon0" alt="" height="40" width="40">
+                    <img src="" id="icon0" alt="" height="60" width="60">
                     <h1 id="currentTemp0">Current</h1>
                     <h4 id="maxTemp0">Max</h4>
                     <h4 id="minTemp0">Min</h4>
@@ -53,7 +51,7 @@
                     <h4 id="wordDay1">Day 1</h4>
                     <h4 id="monthDay1">month-day 1</h4>
                     <h4 id="forecast1">Forecast</h4>
-                    <img src="" id="icon1">
+                    <img src="" id="icon1" alt="" height="60" width="60">
                     <h1 id="currentTemp1">Current</h1>
                     <h4 id="maxTemp1">Max</h4>
                     <h4 id="minTemp1">Min</h4>
@@ -63,7 +61,7 @@
                     <h4 id="wordDay2">Day 2</h4>
                     <h4 id="monthDay2">month-day 2</h4>
                     <h4 id="forecast2">Forecast</h4>
-                    <img src="" id="icon2">
+                    <img src="" id="icon2" alt="" height="60" width="60">
                     <h1 id="currentTemp2">Current</h1>
                     <h4 id="maxTemp2">Max</h4>
                     <h4 id="minTemp2">Min</h4>
@@ -73,7 +71,7 @@
                     <h4 id="wordDay3">Day 3</h4>
                     <h4 id="monthDay3">month-day 3</h4>
                     <h4 id="forecast3">Forecast</h4>
-                    <img src="" id="icon3">
+                    <img src="" id="icon3" alt="" height="60" width="60">
                     <h1 id="currentTemp3">Current</h1>
                     <h4 id="maxTemp3">Max</h4>
                     <h4 id="minTemp3">Min</h4>
@@ -83,7 +81,7 @@
                     <h4 id="wordDay4">Day 4</h4>
                     <h4 id="monthDay4">month-day 4</h4>
                     <h4 id="forecast4">Forecast</h4>
-                    <img src="" id="icon4">
+                    <img src="" id="icon4" alt="" height="60" width="60">
                     <h1 id="currentTemp4">Current</h1>
                     <h4 id="maxTemp4">Max</h4>
                     <h4 id="minTemp4">Min</h4>

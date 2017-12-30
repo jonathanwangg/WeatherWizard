@@ -14,17 +14,20 @@ $(document).ready(function () {
 
     getLocation();
 
-    // TODO: implement button functionality when everything ELSE is implemented
-    $("#searchButton").click(function () {
+    function customSearch() {
         console.log("in callback function of #searchButton jquery");
-        var searchParameter:string = (<HTMLInputElement>document.getElementById("searchButton")).value;
+        var searchParameter:string = (<HTMLInputElement>document.getElementById("searchBox")).value;
         try {
             return new Promise(function (resolve: any, reject: any) {
-                $.getJSON("api.openweathermap.org/data/2.5/forecast?q=" + searchParameter + "&appid=" + appid, function (weatherResponse) {
-                    console.log("weatherResponse for searching is: ");
-                    console.log(weatherResponse);
-                    resolve(weatherResponse);
-                });
+                if (searchParameter !== "") {
+                    $.getJSON("https://api.openweathermap.org/data/2.5/forecast?q=" + searchParameter + "&appid=" + appid, function (weatherResponse) {
+                        console.log("weatherResponse for searching is: ");
+                        console.log(weatherResponse);
+                        resolve(weatherResponse);
+                    });
+                } else {
+                    alert("Please enter a city and it's ISO country code.")
+                }
 
             }).then(function (weatherResponse: any) {
                 // Don't have to create a new WeatherData here, just call set general
@@ -34,7 +37,15 @@ $(document).ready(function () {
         } catch (err) {
             showError("We can't find information about your city!");
         }
+    }
+    // TODO: implement button functionality when everything ELSE is implemented
+    $("#searchButton").click(customSearch);
 
+    $(document).keypress(function (e) {
+        if(e.keyCode === 13) {
+            e.preventDefault();
+            customSearch();
+        }
     });
 
     /**
@@ -60,7 +71,7 @@ $(document).ready(function () {
         try {
             return new Promise(function (resolve: any, reject: any) {
                 $.getJSON("https://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon +
-                    "&appid=178e8d4180edebe4e2c02fcad75b72fd", function (weatherResponse) {
+                    "&appid=" + appid, function (weatherResponse) {
                     console.log("weatherResponse is: ");
                     console.log(weatherResponse);
                     resolve(weatherResponse);
