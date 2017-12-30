@@ -4,19 +4,38 @@ import {parse} from "ts-node/dist";
 
 const months: string[]    = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const daysShort: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const appid:string = "178e8d4180edebe4e2c02fcad75b72fd";
 
 
 $(document).ready(function () {
     var deg = '&#176';
     var celsius = 'C';
-    var farenheit = 'F';
+    var weatherDiv = $('#weather');
 
     getLocation();
 
     // TODO: implement button functionality when everything ELSE is implemented
-    // $("#findWeatherButton").click(function () {
-    //     getLocation();
-    // });
+    $("#searchButton").click(function () {
+        console.log("in callback function of #searchButton jquery");
+        var searchParameter:string = (<HTMLInputElement>document.getElementById("searchButton")).value;
+        try {
+            return new Promise(function (resolve: any, reject: any) {
+                $.getJSON("api.openweathermap.org/data/2.5/forecast?q=" + searchParameter + "&appid=" + appid, function (weatherResponse) {
+                    console.log("weatherResponse for searching is: ");
+                    console.log(weatherResponse);
+                    resolve(weatherResponse);
+                });
+
+            }).then(function (weatherResponse: any) {
+                // Don't have to create a new WeatherData here, just call set general
+                var weatherData = new WeatherData();
+                var generalWeatherData = setGeneralInformation(weatherData, weatherResponse);
+            });
+        } catch (err) {
+            showError("We can't find information about your city!");
+        }
+
+    });
 
     /**
      * called when the user clicks the "find weather" button
@@ -93,14 +112,8 @@ $(document).ready(function () {
      */
     function setGeneralInformation(weatherData: WeatherData, weatherResponse: any): WeatherData {
         var uniqueWeek: string[] = createWeek(weatherResponse);
-        console.log("unique week:")
-        console.log(uniqueWeek);
         var daysOfTheWeek: string[] = createDaysOfTheWeek(uniqueWeek);
-        console.log("daysOfTheWeek: ");
-        console.log(daysOfTheWeek);
         var datesOfTheWeek: string[] = createDatesOfTheWeek(uniqueWeek);
-        console.log("datesOfTheWeek: ");
-        console.log(datesOfTheWeek);
         setDayOfTheWeekIntoHTML(daysOfTheWeek);
         setDatesOfTheWeekIntoHTML(datesOfTheWeek);
         var city = determineCity(weatherResponse);
@@ -134,21 +147,6 @@ $(document).ready(function () {
 
     function showError(msg: any) {
         weatherDiv.addClass('error').html(msg);
-    };
-
-    /**
-     * formats the time from 24hr to 12hr with AM / PM
-     * @returns {string} the current day and time in DAY_OF_THE_WEEK MONTH DAY HOUR MINS AMPM
-     */
-    function formatTimeIntoAMPM(date: Date): string {
-        console.log("got into format time method");
-        var minutes: string|number = date.getMinutes.toString().length === 1 ? '0' + date.getMinutes() : date.getMinutes();
-        var hours: string|number = date.getHours().toString().length == 1 ? '0' + date.getHours() : date.getHours();
-        var ampm: string = date.getHours() >= 12 ? 'pm' : 'am';
-
-        var combinedDate: string = date.getDay() + ' ' + months[date.getMonth()] + ' ' + date.getDate() + ' ' + hours + minutes + ampm;
-        return combinedDate;
-
     };
 
     // TODO: will need to be changed (refer to GitHub issues)
@@ -347,7 +345,7 @@ $(document).ready(function () {
     };
 
     function setCityAndCountryIntoHTML(city: string, country: string) {
-        document.getElementById("currentCityAndCountry").innerText = city + ", " + country;
+        document.getElementById("currentCityAndCountry").innerText = "Location: " + city + ", " + country;
     };
 
     function setCurrentTempWeekIntoHTML(currentTempWeek: number[]) {
@@ -374,10 +372,9 @@ $(document).ready(function () {
         }
     }
 
-    // TODO: must cast HTMLElement to HTMLImageElement
     function setWeatherIconWeekIntoHTML(weatherIconIds: string[]) {
         for (let i = 0; i < weatherIconIds.length; i++) {
-            document.getElementById("icon" + i).src = "http://openweathermap.org/img/w/" + weatherIconIds[i] + ".png"
+            document.getElementById("icon" + i).setAttribute("src","http://openweathermap.org/img/w/" + weatherIconIds[i] + ".png");
         }
     }
 
