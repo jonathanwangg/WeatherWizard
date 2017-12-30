@@ -1,10 +1,11 @@
 # WeatherWizard
-Determine the 5-day weather forecast for a city by simply searching for it!
+Determine the 5-day weather forecast for a city by simply searching for it! This application will
+show current temperature, maximum temperature, minimum temperature as well as the forecast for 5 days
+in your current city or whichever city you want to search for.
 
 Technologies Used:
 - TypeScript
 - HTML
-- CSS
 - jQuery
 - Bootstrap
 
