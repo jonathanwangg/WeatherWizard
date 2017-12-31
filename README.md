@@ -3,7 +3,7 @@ Determine the 5-day weather forecast for a city by simply searching for it! This
 show current temperature, maximum temperature, minimum temperature as well as the forecast for 5 days
 in your current city or whichever city you want to search for.
 
-![Screenshot of weather forecast UI](src/screenshots/WeatherWizardPicture.png "Screenshot of the current weather in Cairo, Egypt.")
+![Screenshot of weather forecast UI](src/screenshots/WeatherWizardScreenshot.png "Screenshot of the current weather in Cairo, Egypt.")
 
 Technologies Used:
 - TypeScript
