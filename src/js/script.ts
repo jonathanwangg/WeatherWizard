@@ -1,6 +1,5 @@
 import {WeatherData} from "./WeatherData"
 import $ = require("jquery");
-import {parse} from "ts-node/dist";
 
 const months: string[]    = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const daysShort: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -10,7 +9,6 @@ const appid: string = "178e8d4180edebe4e2c02fcad75b72fd";
 $(document).ready(function () {
     var deg = '&#176';
     var celsius = 'C';
-    var fahrenheit = 'F';
     var weatherDiv = $('#weather');
 
     getLocation();
@@ -46,7 +44,7 @@ $(document).ready(function () {
     /**
      * handler for when the enter key is pressed, do a custom search for location and disallow refresh
      */
-    $(document).keypress(function (event) {
+    $(document).keypress(function (event: any) {
         if(event.keyCode === 13) {
             event.preventDefault();
             customSearch();
@@ -239,7 +237,6 @@ $(document).ready(function () {
     function determineCurrentTemp(weatherResponse: any, uniqueWeek: string[]): number[] {
         var arrayOfCurrentTempsWeek: number[] = [];
         for (let j = 0; j < uniqueWeek.length; j++) {
-            let arrayOfCurrentTempsSingleDay: number[] = [];
             for (let i = 0; i < weatherResponse.list.length; i++) {
                 if (weatherResponse.list[i].dt_txt.includes(uniqueWeek[j])) {
                     arrayOfCurrentTempsWeek.push(weatherResponse.list[i].main.temp);

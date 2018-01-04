@@ -11,7 +11,9 @@ Technologies Used:
 - jQuery
 - Bootstrap
 
-Steps for Loading in Browser
+# CURRENTLY REFACTORING CODE
+
+# Steps for Loading in Browser
 1) Finish writing code in script.ts
 2) yarn build (compiles it into script.js)
 3) browserify script.js -o bundle.js (bundles it into bundle.js so I can use "require" in browser)
